@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Marker Map™ — Dalia Ayesh RDN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--hibiscus:#e86a91;--hibiscus-light:#fbeaf0;--seafoam:#256867;--seafoam-light:#e1f5ee;--midnight:#191A1A;--cream:#fdf9f6;--warm-white:#fffcfa;--text-main:#2a2020;--text-muted:#7a6868;--text-hint:#b0a0a0;--border:rgba(232,106,145,0.15);--border-strong:rgba(232,106,145,0.3);--shadow:0 2px 20px rgba(232,106,145,0.08);--shadow-hover:0 4px 30px rgba(232,106,145,0.15);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text-main);min-height:100vh;}
+.hero{background:var(--midnight);padding:3rem 2rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(232,106,145,0.2) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-block;font-size:11px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--hibiscus);border:1px solid rgba(232,106,145,0.4);padding:5px 14px;border-radius:20px;margin-bottom:1.25rem;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:400;color:#fff;line-height:1.15;margin-bottom:0.75rem;}
+.hero h1 em{font-style:italic;color:var(--hibiscus);}
+.hero p{font-size:14px;font-weight:300;color:rgba(255,255,255,0.55);max-width:520px;margin:0 auto 1.75rem;line-height:1.7;}
+.stats-row{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:var(--hibiscus);line-height:1;}
+.stat-label{font-size:11px;font-weight:300;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-top:3px;}
+.main{max-width:900px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.sys-legend{background:var(--warm-white);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;}
+.sys-legend-title{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-hint);margin-bottom:8px;}
+.sys-legend-row{display:flex;flex-wrap:wrap;gap:5px;}
+.search-wrap{position:relative;margin-bottom:0.5rem;}
+.search-wrap input{width:100%;padding:12px 16px 12px 42px;font-family:'Jost',sans-serif;font-size:14px;border:1px solid var(--border-strong);border-radius:50px;background:var(--warm-white);color:var(--text-main);outline:none;transition:all 0.2s;}
+.search-wrap input:focus{border-color:var(--hibiscus);box-shadow:0 0 0 3px rgba(232,106,145,0.1);}
+.search-wrap input::placeholder{color:var(--text-hint);}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-hint);}
+.result-count{text-align:right;font-size:12px;color:var(--text-hint);margin-bottom:1rem;padding-right:4px;}
+.tabs-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
+.tab{font-family:'Jost',sans-serif;font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border-strong);background:var(--warm-white);color:var(--text-muted);cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.tab:hover{border-color:var(--hibiscus);color:var(--hibiscus);background:var(--hibiscus-light);}
+.tab.active{background:var(--hibiscus);border-color:var(--hibiscus);color:#fff;}
+.export-btn{display:inline-flex;align-items:center;gap:6px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;padding:8px 18px;border-radius:20px;border:1px solid var(--border-strong);background:var(--warm-white);color:var(--text-muted);cursor:pointer;transition:all 0.2s;margin-bottom:1.5rem;}
+.export-btn:hover{border-color:var(--hibiscus);color:var(--hibiscus);background:var(--hibiscus-light);}
+.cat-header{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+.cat-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cat-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;}
+.cat-count{font-size:11px;color:var(--text-hint);margin-left:auto;}
+.markers-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:0.5rem;}
+.marker-card{background:var(--warm-white);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;}
+.marker-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow);}
+.marker-card.open{border-color:var(--hibiscus);box-shadow:var(--shadow-hover);}
+.marker-head{display:flex;align-items:center;gap:10px;padding:12px 16px;}
+.marker-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.marker-name{font-size:14px;font-weight:500;color:var(--text-main);flex:1;}
+.marker-range-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--hibiscus-light);color:var(--hibiscus);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;}
+.marker-chevron{font-size:11px;color:var(--text-hint);flex-shrink:0;transition:transform 0.2s;}
+.marker-card.open .marker-chevron{transform:rotate(180deg);}
+.marker-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+.marker-card.open .marker-body{display:block;animation:sd 0.2s ease;}
+@keyframes sd{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.ranges-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.range-box{border-radius:10px;padding:10px 12px;}
+.range-box.conv{background:#f5f3f0;border-left:3px solid #b0a0a0;}
+.range-box.opt{background:var(--hibiscus-light);border-left:3px solid var(--hibiscus);}
+.range-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;}
+.range-box.conv .range-label{color:var(--text-muted);}
+.range-box.opt .range-label{color:var(--hibiscus);}
+.range-value{font-size:13px;font-weight:400;color:var(--text-main);line-height:1.5;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.detail-box{background:var(--cream);border-radius:10px;padding:10px 12px;border:1px solid var(--border);}
+.detail-box.full{grid-column:1/-1;}
+.detail-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+.detail-text{font-size:13px;line-height:1.6;color:var(--text-main);font-weight:300;}
+.low-box{border-left:3px solid #5DCAA5;}
+.high-box{border-left:3px solid var(--hibiscus);}
+.low-box .detail-label{color:#0f6e56;}
+.high-box .detail-label{color:var(--hibiscus);}
+.note-box{border-left:3px solid var(--seafoam);background:var(--seafoam-light);}
+.note-box .detail-label{color:var(--seafoam);}
+.symptom-tags,.systems-row{display:flex;flex-wrap:wrap;gap:5px;}
+.stag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--warm-white);color:var(--text-muted);border:1px solid var(--border-strong);}
+.sys-tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;}
+.s-energy{background:#fff3e0;color:#854f0b;border:1px solid #f5c97a;}
+.s-metabolic{background:#e1f5ee;color:#0f6e56;border:1px solid #82cdb5;}
+.s-hormonal{background:#fbeaf0;color:#993556;border:1px solid #f4b8cc;}
+.s-inflammation{background:#faece7;color:#993c1d;border:1px solid #f5b8a0;}
+.s-nervous{background:#eeedfe;color:#534ab7;border:1px solid #b5b0f0;}
+.s-gut{background:#eaf3de;color:#3b6d11;border:1px solid #9dcf6a;}
+.s-detox{background:#e6f1fb;color:#185fa5;border:1px solid #90c0ec;}
+.s-flow{background:#fcebeb;color:#a32d2d;border:1px solid #f0a0a0;}
+.dhea-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.dhea-table th{background:var(--hibiscus-light);color:var(--hibiscus);font-weight:600;padding:6px 10px;text-align:left;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;}
+.dhea-table td{padding:5px 10px;border-bottom:1px solid var(--border);color:var(--text-main);font-weight:300;}
+.dhea-table tr:last-child td{border-bottom:none;}
+.dhea-table tr:nth-child(even) td{background:rgba(232,106,145,0.03);}
+.no-results{text-align:center;padding:3rem 1rem;color:var(--text-hint);}
+.no-results-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+.no-results p{font-size:14px;font-weight:300;}
+.footer{text-align:center;padding:2rem;font-size:12px;font-weight:300;color:var(--text-hint);border-top:1px solid var(--border);margin-top:2rem;}
+.footer strong{color:var(--hibiscus);font-weight:500;}
+@media(max-width:600px){.detail-grid,.ranges-row{grid-template-columns:1fr;}.marker-range-pill{display:none;}.hero{padding:2rem 1rem;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">✦ DALIA AYESH RD</div>
+  <h1>The <em>Marker Map™</em></h1>
+  <p>Your complete functional lab reference. Click any marker to see conventional vs optimal ranges, symptoms, body systems affected, and low/high interpretations — based on FNM™ clinical standards.</p>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-num">55</div><div class="stat-label">Markers</div></div>
+    <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Categories</div></div>
+    <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Body Systems</div></div>
+    <div class="stat-item"><div class="stat-num">150+</div><div class="stat-label">Symptoms Mapped</div></div>
+  </div>
+</div>
+<div class="main">
+  <div class="sys-legend">
+    <div class="sys-legend-title">Body Systems Key</div>
+    <div class="sys-legend-row">
+      <span class="sys-tag s-energy">⚡ Cellular Energy</span>
+      <span class="sys-tag s-metabolic">🔥 Metabolic Health</span>
+      <span class="sys-tag s-hormonal">🌸 Hormonal Health</span>
+      <span class="sys-tag s-inflammation">🛡️ Inflammation + Immune</span>
+      <span class="sys-tag s-nervous">🧠 Nervous System</span>
+      <span class="sys-tag s-gut">🌿 Gut Health</span>
+      <span class="sys-tag s-detox">🧪 Detoxification</span>
+      <span class="sys-tag s-flow">🩸 Flow Network</span>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Search markers, symptoms, or systems (e.g. fatigue, ferritin, hormonal)..." oninput="filter()">
+  </div>
+  <div class="result-count" id="result-count"></div>
+  <div class="tabs-wrap" id="tabs"></div>
+  <button class="export-btn" onclick="exportText()">📋 Export as plain text</button>
+  <div id="content"></div>
+  <div class="no-results" id="no-results" style="display:none;">
+    <div class="no-results-icon">🌸</div>
+    <p>No markers found. Try a different search term.</p>
+  </div>
+</div>
+<div class="footer">Created by <strong>Dalia Ayesh MS, RDN</strong> · Functional Nutrition Mastery™ · Optimal ranges reflect functional medicine standards, not conventional reference intervals.</div>
+
+<script>
+const SYS={
+  energy:{cls:"s-energy",label:"⚡ Cellular Energy"},
+  metabolic:{cls:"s-metabolic",label:"🔥 Metabolic Health"},
+  hormonal:{cls:"s-hormonal",label:"🌸 Hormonal Health"},
+  inflammation:{cls:"s-inflammation",label:"🛡️ Inflammation + Immune"},
+  nervous:{cls:"s-nervous",label:"🧠 Nervous System"},
+  gut:{cls:"s-gut",label:"🌿 Gut Health"},
+  detox:{cls:"s-detox",label:"🧪 Detoxification"},
+  flow:{cls:"s-flow",label:"🩸 Flow Network"}
+};
+const cats=[
+  {id:"all",label:"✦ All Markers",color:"#e86a91",bg:"#fbeaf0",icon:"🗺️"},
+  {id:"iron",label:"Iron Panel",color:"#a32d2d",bg:"#fcebeb",icon:"🩸"},
+  {id:"thyroid",label:"Thyroid",color:"#993556",bg:"#fbeaf0",icon:"🦋"},
+  {id:"cbc",label:"CBC",color:"#185fa5",bg:"#e6f1fb",icon:"🔬"},
+  {id:"cmp",label:"Metabolic Panel",color:"#0f6e56",bg:"#e1f5ee",icon:"⚗️"},
+  {id:"bloodsugar",label:"Blood Sugar",color:"#854f0b",bg:"#faeeda",icon:"📊"},
+  {id:"lipids",label:"Cholesterol",color:"#534ab7",bg:"#eeedfe",icon:"💧"},
+  {id:"nutrients",label:"Nutrients",color:"#3b6d11",bg:"#eaf3de",icon:"🌿"},
+  {id:"inflammation",label:"Inflammation",color:"#993c1d",bg:"#faece7",icon:"🔥"},
+  {id:"hormones",label:"Hormones",color:"#e86a91",bg:"#fbeaf0",icon:"🌸"},
+  {id:"adrenals",label:"Adrenals",color:"#854f0b",bg:"#faeeda",icon:"⚡"}
+];
+const markers=[
+  // IRON
+  {cat:"iron",name:"Serum Iron",conventional:"60–170 mcg/dL",optimal:"60–170 mcg/dL (functional context matters)",symptoms:["Fatigue","Hair loss","Cold intolerance","Brain fog","Pale skin","Weakness","Poor endurance"],systems:["energy","hormonal","flow","detox"],low:"Poor diet, inflammation, blood loss, B12 deficiency, low stomach acid, parasites, raw or vegan diet",high:"Inflammation, stagnant liver pathway, cirrhosis, blood transfusions, hepatitis, iron overload"},
+  {cat:"iron",name:"Ferritin",conventional:"12–150 ng/mL (women)",optimal:"80–100 ng/mL (menstruating); 60–100 ng/mL (meno/men)",symptoms:["Exhaustion","Restless legs","Hair thinning","Poor exercise tolerance","Low mood","Infertility","Cold intolerance"],systems:["energy","hormonal","flow","nervous"],low:"Iron deficiency, chronic blood loss, poor absorption, vegan diet, heavy periods",high:"Inflammation, infection, liver disease, hemochromatosis — elevated during active inflammation may not reflect true iron excess",note:"Ferritin is also an acute phase reactant — always interpret alongside CRP and serum iron."},
+  {cat:"iron",name:"Transferrin",conventional:"200–380 mg/dL",optimal:"200–430 mg/dL",symptoms:["Fatigue","Pallor","Weakness","Anemia symptoms"],systems:["energy","flow"],low:"Iron levels and storage are high — body not producing transport protein",high:"Iron levels and storage are low — body producing more to capture available iron; possible cancer"},
+  {cat:"iron",name:"TIBC (Iron Binding Capacity)",conventional:"250–370 mcg/dL",optimal:"Interpret alongside iron and ferritin",symptoms:["Fatigue","Weakness","Anemia"],systems:["energy","flow"],low:"Iron overload, oxidative stress, liver dysfunction",high:"Low iron/anemia, iron recycling issues — body trying to bind more iron"},
+  // THYROID
+  {cat:"thyroid",name:"TSH",conventional:"0.5–4.5 mIU/L",optimal:"1.5–3.0 mIU/L",symptoms:["Fatigue","Weight gain","Cold hands & feet","Hair loss","Brain fog","Constipation","Low mood","Infertility","Irregular cycles","Puffy face"],systems:["energy","metabolic","hormonal","nervous","flow"],low:"Hyperthyroidism, Grave's disease, stress, pathogens, heavy metals, pituitary disease, too much iodine without selenium",high:"Hypothyroidism, Hashimoto's, radiation, chlorine byproducts, pathogens, mold, thyroid removal"},
+  {cat:"thyroid",name:"Free T4",conventional:"0.8–1.8 ng/dL",optimal:"1.1–1.8 ng/dL",symptoms:["Fatigue","Weight changes","Temperature dysregulation","Low mood","Constipation","Hair loss"],systems:["energy","metabolic","hormonal"],low:"Hypothyroid, need for iodine/selenium, stealth pathogens, chlorine, heavy metals, mito/cortisol issues",high:"Hyperthyroid, mold, overmedicated, stealth pathogens, chlorine, heavy metals"},
+  {cat:"thyroid",name:"Free T3",conventional:"2.3–4.2 pg/mL",optimal:"3.0–4.0 pg/mL",symptoms:["Fatigue","Weight gain","Brain fog","Cold intolerance","Constipation","Infertility","Low progesterone","Hair loss","Depression"],systems:["energy","metabolic","hormonal","nervous"],low:"Hypothyroid — need iodine/selenium, liver conversion issue, stealth pathogens, chlorine, heavy metals",high:"Hyperthyroid — mold, overmedicated, stealth pathogens, cancer"},
+  {cat:"thyroid",name:"Total T4",conventional:"5.0–12.0 mcg/dL",optimal:"6.0–12.0 mcg/dL",symptoms:["Fatigue","Hair loss","Dry skin","Weight changes","Low mood"],systems:["energy","metabolic","hormonal"],low:"Hypothyroidism, requires iodine, thyroiditis, low protein diet, cancer",high:"Hyperthyroidism, too much iodine without selenium, thyroid inflammation, stealth infections"},
+  {cat:"thyroid",name:"Total T3",conventional:"80–200 ng/dL",optimal:"100–180 ng/dL",symptoms:["Fatigue","Weight gain","Brain fog","Cold intolerance","Hair loss","Constipation"],systems:["energy","metabolic","hormonal"],low:"Liver issues, selenium need, poor T4-to-T3 conversion — mainly indicates a conversion problem",high:"Hyperthyroid, mold, stealth infections — same as Total T4 elevation patterns"},
+  {cat:"thyroid",name:"Reverse T3",conventional:"9.2–24.1 ng/dL",optimal:"9–18 ng/dL",symptoms:["Fatigue","Weight gain despite effort","Brain fog","Can't lose weight","Feeling cold","Depression"],systems:["energy","metabolic","hormonal","nervous"],low:"Hypothyroidism, hyperparathyroidism, poor diet",high:"Chronic stress, birth control pills, low T3 syndrome, iron deficiency, aging, levothyroxine, liver stagnation, anorexia, excessive sauna use",note:"High Reverse T3 blocks Free T3 receptor sites — creates functional hypothyroidism even when other thyroid markers look normal."},
+  {cat:"thyroid",name:"T3 Uptake",conventional:"24–39%",optimal:"28–38%",symptoms:["Fatigue","Hormone imbalance","Weight changes"],systems:["hormonal","metabolic"],low:"High estrogen, birth control — lower uptake",high:"High testosterone, higher uptake"},
+  {cat:"thyroid",name:"TPO Antibodies",conventional:"<35 IU/mL",optimal:"Negative",symptoms:["Fatigue","Hashimoto's symptoms","Autoimmune flares","Brain fog","Cold intolerance","Anxiety"],systems:["inflammation","hormonal","nervous","energy"],low:"N/A",high:"Autoimmunity, Hashimoto's or Grave's disease — most common cause of thyroid dysfunction in women"},
+  {cat:"thyroid",name:"Thyroglobulin Antibodies",conventional:"<1 IU/mL",optimal:"Negative",symptoms:["Thyroid symptoms","Autoimmune reactivity","Fatigue","Joint pain"],systems:["inflammation","hormonal"],low:"N/A",high:"Autoimmunity, Hashimoto's — can be an early warning sign, often elevated before TPO Ab"},
+  // CBC
+  {cat:"cbc",name:"WBC",conventional:"4.5–11.0 x10³/µL",optimal:"4.5–9.0 x10³/µL",symptoms:["Frequent illness","Poor immune function","Chronic infections","Fatigue","Slow recovery"],systems:["inflammation","energy"],low:"Poor immune function, chronic or acute stealth infections",high:"High inflammation, acute infection — immune system actively responding"},
+  {cat:"cbc",name:"RBC",conventional:"3.9–5.0 x10⁶/µL (women)",optimal:"4.5–6.0 x10⁶/µL",symptoms:["Fatigue","Pallor","Weakness","Shortness of breath","Dizziness","Poor endurance"],systems:["energy","flow"],low:"B6, B12, folate deficiency, anemia, poor absorption",high:"Dehydration, upper respiratory infection, polycythemia"},
+  {cat:"cbc",name:"Hemoglobin",conventional:"12.0–16.0 g/dL (women)",optimal:"12–17 g/dL",symptoms:["Fatigue","Pallor","Cold intolerance","Brain fog","Shortness of breath","Heavy periods"],systems:["energy","flow","nervous"],low:"Bleeding, B6/B12/folate deficiency, raw diet, iron deficiency",high:"Dehydration, polycythemia vera, heart failure, liver cancer, altitude"},
+  {cat:"cbc",name:"Hematocrit",conventional:"36–46% (women)",optimal:"40–50%",symptoms:["Fatigue","Dizziness","Shortness of breath","Weakness"],systems:["energy","flow"],low:"Anemia, blood loss, nutrient deficiency — same as hemoglobin low",high:"Dehydration, polycythemia vera — same as hemoglobin high"},
+  {cat:"cbc",name:"MCV",conventional:"80–100 fL",optimal:"68–100 fL",symptoms:["Fatigue","Brain fog","Tingling/numbness","Anemia symptoms"],systems:["energy","flow","nervous"],low:"Iron deficiency — small, pale red blood cells",high:"Megaloblastic anemia — need for B12 and folate; cells too large to carry oxygen efficiently"},
+  {cat:"cbc",name:"MCH",conventional:"27–33 pg",optimal:"27–32 pg",symptoms:["Fatigue","Pale skin","Weakness","Brain fog"],systems:["energy","flow"],low:"Iron, vitamin B6 deficiency, possible heavy metals or toxins",high:"Requires vitamin B6, B12"},
+  {cat:"cbc",name:"MCHC",conventional:"32–36 g/dL",optimal:"33–37 g/dL",symptoms:["Fatigue","Pallor","Anemia symptoms","Weakness"],systems:["energy","flow"],low:"Vitamin B5, B6, B12, and iron need",high:"Hyperthyroid, cancer"},
+  {cat:"cbc",name:"RDW",conventional:"11.5–14.5%",optimal:"11.5–14%",symptoms:["Fatigue","Anemia symptoms","Nutrient deficiency signs"],systems:["energy","flow","gut"],low:"Acute blood loss and stress",high:"Folate, iron, B12 need — cells vary in size, suggesting nutrient-driven production issue"},
+  {cat:"cbc",name:"Platelets",conventional:"150–400 x10³/µL",optimal:"150–450 x10³/µL",symptoms:["Easy bruising","Clotting issues","Fatigue","Unexplained bleeding"],systems:["flow","inflammation"],low:"Clotting disorders, stealth pathogens (babesia, bartonella), chronic stress",high:"Stress, acute infection, autoimmunity, cancer — reactive thrombocytosis"},
+  {cat:"cbc",name:"Neutrophils",conventional:"1,800–7,700/µL",optimal:"55–70% or 2,500–7,000 Abs",symptoms:["Recurrent bacterial infections","Immune weakness","Slow healing","Frequent illness"],systems:["inflammation","energy"],low:"Poor function against bacteria — chronic mold, viral infection, environmental toxins",high:"Acute bacterial/viral/parasitic infection, prolonged trauma, stress, steroids"},
+  {cat:"cbc",name:"Lymphocytes",conventional:"1,000–4,800/µL",optimal:"25–35% or 1,700–3,500 Abs",symptoms:["Chronic viral illness","Poor immune recovery","Fatigue","Swollen lymph nodes"],systems:["inflammation","energy","flow"],low:"Chronic poor immune function, viral infection, mold, toxins, heavy metals",high:"Acute or chronic viral infections, lymphomas or leukemias"},
+  {cat:"cbc",name:"Monocytes",conventional:"200–800/µL",optimal:"4–6% or 200–600 Abs",symptoms:["Fatigue","Persistent low-grade illness","Chronic infections","Slow healing"],systems:["inflammation","gut"],low:"B12 deficiency, aplastic anemia, lupus, RA, TB",high:"Atypical infections (EBV, measles, mumps), parasitic infections, healing phase"},
+  {cat:"cbc",name:"Eosinophils",conventional:"0–500/µL",optimal:"1–3% or 100–300 Abs",symptoms:["Allergies","Skin rashes","Bloating","Gut issues","Asthma","Chronic nasal congestion"],systems:["inflammation","gut"],low:"Steroid use, high cortisol/stress, asthma, leukemia, alcohol",high:"Parasites, severe allergies, asthma, lupus, Crohn's, UC, organ transplant rejection"},
+  {cat:"cbc",name:"Basophils",conventional:"0–100/µL",optimal:"0.4–1% or 40–100 Abs",symptoms:["Thyroid symptoms","Gut inflammation","Allergies","Itching"],systems:["inflammation","hormonal"],low:"Hyperthyroidism, ovulation, pregnancy",high:"Hypothyroid, UC, parasites, RA, allergies, chickenpox, TB"},
+  // CMP
+  {cat:"cmp",name:"BUN",conventional:"7–20 mg/dL",optimal:"6–20 mg/dL",symptoms:["Fatigue","Poor recovery","Kidney stress","Weakness","Nausea"],systems:["detox","metabolic","gut"],low:"Malnutrition, low protein diet, liver/pancreas disease, anabolic steroids, poor absorption",high:"Dehydration, CKD, GI bleeding, high protein diet, infection, stress, thyroid abnormalities"},
+  {cat:"cmp",name:"Creatinine",conventional:"0.5–1.1 mg/dL (women)",optimal:"0.6–1.2 mg/dL",symptoms:["Fatigue","Muscle weakness","Kidney stress","Swelling"],systems:["detox","metabolic"],low:"Poor absorption, muscle breakdown, liver/kidney stress, malnutrition",high:"Dehydration, acute kidney injury, CKD, kidney stones, blockages"},
+  {cat:"cmp",name:"eGFR",conventional:">60 mL/min",optimal:">90 mL/min",symptoms:["Fatigue","Swelling","Kidney stress","Foamy urine","High blood pressure"],systems:["detox","flow"],low:"N/A — lower is worse; below 60 indicates kidney impairment",high:"Higher is better — no concern above 90"},
+  {cat:"cmp",name:"Sodium",conventional:"136–145 mEq/L",optimal:">140 mEq/L ideal",symptoms:["Fatigue","Brain fog","Muscle cramps","Low blood pressure","Headache","Nausea"],systems:["nervous","energy","flow"],low:"Mito damage, cortisol changes, diuretics, dehydration, overhydration, certain cancers",high:"SAD diet, chronic stress, dehydration, diuretics, excessive sweating, burns"},
+  {cat:"cmp",name:"Potassium",conventional:"3.5–5.0 mEq/L",optimal:">4.5 mEq/L ideal",symptoms:["Muscle cramps","Heart palpitations","Fatigue","Constipation","Weakness","Irregular heartbeat"],systems:["nervous","energy","flow","metabolic"],low:"Diuretics, alcohol use, CKD, sweating, diarrhea, folate deficiency, antibiotics",high:"Dehydration, potassium-sparing drugs, mito damage, CHF, CKD, adrenal insufficiency"},
+  {cat:"cmp",name:"Chloride",conventional:"98–106 mEq/L",optimal:"96–106 mEq/L",symptoms:["Fatigue","Acid-base imbalance","Muscle weakness","Digestive distress"],systems:["gut","metabolic"],low:"Dehydration, mito dysfunction, cortisol changes, steroids, vomiting",high:"Too much salt intake, CKD, diarrhea, vomiting, sweating, certain cancers"},
+  {cat:"cmp",name:"Calcium",conventional:"8.6–10.3 mg/dL",optimal:"8.5–10.2 mg/dL",symptoms:["Muscle cramps","Bone pain","Fatigue","Brain fog","Tingling","Heart palpitations"],systems:["nervous","energy","flow","hormonal"],low:"Vitamin D deficiency, poor intake, hormonal changes, pancreatitis, seizure meds",high:"Hyperparathyroidism, cancer, excess vitamin D, diuretics, kidney disease"},
+  {cat:"cmp",name:"Phosphorus",conventional:"2.5–4.5 mg/dL",optimal:"3.0–4.5 mg/dL",symptoms:["Bone pain","Fatigue","Muscle weakness","Joint pain","Dental issues"],systems:["energy","metabolic","detox"],low:"Hyperparathyroidism, low stomach acid, diabetes, malnourishment, vitamin D deficiency, alcoholism",high:"Kidney failure, bone cancer, excess vitamin D, DM, SAD, stress"},
+  {cat:"cmp",name:"Total Protein",conventional:"6.3–8.2 g/dL",optimal:"6.0–8.3 g/dL",symptoms:["Fatigue","Poor immunity","Edema","Slow healing","Muscle loss"],systems:["gut","inflammation","metabolic"],low:"Liver/malnutrition issues, inflammation, poor absorption, low stomach acid, kidney disease",high:"High protein diet, kidney disease, dehydration, acute infections, cancer"},
+  {cat:"cmp",name:"Albumin",conventional:"3.5–5.0 g/dL",optimal:"3.1–5.4 g/dL",symptoms:["Edema","Fatigue","Poor wound healing","Weak immunity","Low blood pressure"],systems:["gut","detox","flow"],low:"Poor diet/absorption, inflammation, kidney/liver/heart disease, cancer, TB",high:"High protein diet, dehydration, kidney/liver/heart disease, severe infections"},
+  {cat:"cmp",name:"Globulin",conventional:"2.0–3.5 g/dL",optimal:"2.0–3.9 g/dL",symptoms:["Immune dysfunction","Fatigue","Gut issues","Chronic infections"],systems:["inflammation","gut"],low:"Kidney disease, protein loss, liver disease, immune deficiency, malnutrition, leaky gut",high:"Dehydration, low stomach acid, inflammation from mold, parasites, bacteria/viruses"},
+  {cat:"cmp",name:"A/G Ratio",conventional:"1.2–2.2",optimal:"1.1–2.5",symptoms:["Liver stress","Immune imbalance","Fatigue","Fluid retention"],systems:["detox","inflammation"],low:"Liver dysfunction, stagnant liver pathway, inflammation",high:"Dehydration, steroids, hGH"},
+  {cat:"cmp",name:"GGT",conventional:"<40 U/L",optimal:"12–35 U/L",symptoms:["Liver stress","Fatigue","Bile issues","Bloating","Right-side discomfort"],systems:["detox","gut"],low:"Glutathione deficiency, mito dysfunction, magnesium deficiency",high:"Cancer, bile duct issue, liver damage, stagnant liver pathway, hepatitis, pancreatitis, alcohol",note:"GGT is one of the most sensitive markers of liver stress and glutathione depletion. Order when Alk Phos is elevated."},
+  {cat:"cmp",name:"Bilirubin",conventional:"0.1–1.2 mg/dL",optimal:"0.2–1.1 mg/dL",symptoms:["Jaundice","Fatigue","Liver stress","Yellow skin/eyes","Dark urine"],systems:["detox","flow"],low:"Caffeine, NSAIDs (aspirin/ibuprofen), barbiturate drugs",high:"Biliary duct blockage, RBC destruction, gallstones, gallbladder issues, liver disease, pregnancy"},
+  {cat:"cmp",name:"Alk Phos",conventional:"44–147 U/L",optimal:"44–100 U/L (lower end preferred)",symptoms:["Bone/liver stress","Fatigue","Gut symptoms","Joint pain"],systems:["detox","gut","energy"],low:"Liver dysfunction, mito issues, magnesium/B12/zinc deficiency, hypothyroid, excess cortisol",high:"Liver disease, inflammation, high bilirubin, bone disease, cancer, pregnancy, certain drugs"},
+  {cat:"cmp",name:"AST",conventional:"10–40 U/L",optimal:"10–34 U/L",symptoms:["Liver stress","Fatigue","Muscle damage","Post-illness recovery","Right upper abdominal discomfort"],systems:["detox","energy"],low:"Mito dysfunction, inflammation, vitamin B6 deficiency, kidney or cardiac disease",high:"Stagnant liver pathway, fatty liver, alcohol, hepatitis, EBV, CMV, cancer, thyroid issues, celiac"},
+  {cat:"cmp",name:"ALT",conventional:"7–56 U/L",optimal:"7–42 U/L",symptoms:["Liver stress","Fatigue","Nausea","Bloating","Right abdominal discomfort"],systems:["detox","metabolic"],low:"Mito dysfunction, inflammation, vitamin B6 deficiency",high:"Liver stress, fatty liver, alcohol, hepatitis — more liver-specific than AST"},
+  // BLOOD SUGAR
+  {cat:"bloodsugar",name:"Fasting Glucose",conventional:"70–100 mg/dL",optimal:"70–85 mg/dL",symptoms:["Energy crashes","Sugar cravings","Brain fog","Weight gain","Mood swings","Fatigue after meals","Hangry episodes","Afternoon slump"],systems:["energy","metabolic","hormonal","nervous"],low:"Poor liver function, malnutrition, insulin tumor, skipping meals, long-term fasting",high:"Liver stagnation, diabetes, mito dysfunction, chronic stress, infection, SAD diet",note:"Optimal fasting glucose below 85 reduces risk of insulin resistance years before diabetes develops."},
+  {cat:"bloodsugar",name:"HbA1c",conventional:"<5.7%",optimal:"4.5–5.3%",symptoms:["Fatigue","Weight gain","Sugar cravings","Hormone imbalance","Inflammation","Brain fog","Mood swings"],systems:["metabolic","hormonal","energy","inflammation"],low:"Poor diet, stress, poor absorption, liver/pancreatic issues, overhydration",high:"Liver and pancreas stagnation, diabetes, blood sugar issues, mito damage, stress, dehydration"},
+  {cat:"bloodsugar",name:"Fasting Insulin",conventional:"2–25 uIU/mL",optimal:"<5 uIU/mL",symptoms:["Weight loss resistance","PCOS","Sugar cravings","Fatigue","Irregular cycles","Acne","Skin tags","Facial hair"],systems:["metabolic","hormonal","inflammation"],low:"N/A",high:"Insulin resistance, PCOS, metabolic syndrome, poor diet, chronic stress, sedentary lifestyle",note:"Fasting insulin is often not run on standard labs — always request it. It is the earliest detectable marker of metabolic dysfunction, often elevated 10–15 years before glucose rises."},
+  // LIPIDS
+  {cat:"lipids",name:"Total Cholesterol",conventional:"<200 mg/dL",optimal:"150–200 mg/dL",symptoms:["Fatigue","Hormone imbalance","Brain fog","Poor immunity","Mood changes","Low libido"],systems:["hormonal","metabolic","nervous","detox"],low:"Poor absorption (celiac), low fat diet, liver/GB insufficiency, mito issues, hyperthyroid, statin drugs — cholesterol is the backbone of all steroid hormones",high:"Liver stagnation, fatty liver, infection, bile stagnation, hypothyroid, heavy metals, DM, chronic stealth infections"},
+  {cat:"lipids",name:"Triglycerides",conventional:"<150 mg/dL",optimal:"70–100 mg/dL",symptoms:["Fatigue","Weight gain","Cardiovascular risk","Blood sugar dysregulation","Brain fog","Abdominal weight"],systems:["metabolic","flow","inflammation"],low:"Mito dysfunction, low fat diet, smoking, obesity, lack of movement, hyperthyroid, malnutrition",high:"Inflammation, alcohol, blood sugar issues, vitamin D deficiency, hypothyroid, kidney disease, diuretics"},
+  {cat:"lipids",name:"HDL Cholesterol",conventional:">50 mg/dL (women)",optimal:"60–70 mg/dL",symptoms:["Cardiovascular risk","Metabolic dysfunction","Hormone imbalance","Low energy","Inflammation"],systems:["flow","metabolic","hormonal","inflammation"],low:"DM, inflammation, smoking, obesity, stagnant liver pathway, fatty liver, poor diet, lack of movement",high:"Autoimmunity, genetics, hyperthyroid, certain cancers, sepsis"},
+  {cat:"lipids",name:"LDL Cholesterol",conventional:"<100 mg/dL",optimal:"70–99 mg/dL",symptoms:["Cardiovascular risk","Inflammation","Liver stress","Atherosclerosis risk"],systems:["flow","inflammation","detox"],low:"Mito dysfunction, inflammation, poor absorption, malnutrition, hyperthyroid — low LDL is not always better",high:"Inflammation, chronic stealth infections, heavy metals, leaky gut, familial hypercholesterolemia, hypothyroid, poor diet"},
+  // NUTRIENTS
+  {cat:"nutrients",name:"Vitamin D",conventional:"30–100 ng/mL",optimal:"60–70 ng/mL (>80 = kidney stone risk)",symptoms:["Fatigue","Low mood","Poor immunity","Bone pain","Hormone imbalance","Infertility","Muscle weakness","Depression","Frequent illness"],systems:["hormonal","inflammation","energy","nervous","flow"],low:"Poor sun exposure, poor absorption, gut dysfunction, obesity, dark skin, indoor lifestyle, celiac, IBD",high:"Excess supplementation — levels above 80 increase kidney stone risk; levels above 100 can cause toxicity",note:"Vitamin D is technically a hormone precursor. It influences over 2,000 genes and is critical for immune regulation, progesterone production, and uterine health."},
+  {cat:"nutrients",name:"Vitamin B12",conventional:"200–900 pg/mL",optimal:"500–1,000 pg/mL",symptoms:["Fatigue","Brain fog","Tingling/numbness","Low mood","Poor memory","Irregular cycles","Weakness","Pale skin","Anxiety"],systems:["energy","nervous","flow","hormonal"],low:"Vegan/vegetarian diet, low stomach acid, poor absorption, metformin use, H. pylori, gut issues, aging",high:"Liver disease, leukemia, excess supplementation — rare, requires follow-up"},
+  {cat:"nutrients",name:"Magnesium RBC",conventional:"1.7–2.2 mg/dL (serum)",optimal:"RBC Magnesium >6 mg/dL",symptoms:["Muscle cramps","Anxiety","PMS","Poor sleep","Constipation","Fatigue","Migraines","Heart palpitations","Period pain","Irritability"],systems:["nervous","energy","hormonal","metabolic"],low:"Need for more magnesium, poor absorption, leaky gut, IBD, chronic stress, alcoholism, diuretics, diabetes",high:"Taking too much magnesium, hypothyroidism, cortisol and mito issues",note:"Serum magnesium is almost always normal even when intracellular levels are depleted. Always order RBC Magnesium for accurate assessment."},
+  // INFLAMMATION
+  {cat:"inflammation",name:"C-Reactive Protein (hsCRP)",conventional:"<3 mg/L",optimal:"<1 mg/L ideal",symptoms:["Fatigue","Pain","Brain fog","Weight gain","Autoimmune symptoms","Hormone dysregulation","Joint pain","Puffy feeling"],systems:["inflammation","hormonal","metabolic","detox"],low:"N/A — lower is better",high:"Non-specific systemic inflammation — infection, autoimmunity, metabolic dysfunction, gut permeability, chronic stress"},
+  {cat:"inflammation",name:"ESR (Erythrocyte Sedimentation Rate)",conventional:"0–20 mm/hr (women)",optimal:"0–30 mm/hr",symptoms:["Fatigue","Autoimmune symptoms","Chronic pain","Unexplained illness","Joint swelling"],systems:["inflammation","flow"],low:"N/A — lower is better",high:"Non-specific systemic inflammation — specifically autoimmunity or cancer; less sensitive than CRP"},
+  {cat:"inflammation",name:"Homocysteine",conventional:"5–15 µmol/L",optimal:"<8 µmol/L",symptoms:["Cardiovascular risk","Brain fog","Fatigue","Poor methylation","Mood issues","Miscarriage risk","Memory problems"],systems:["nervous","flow","detox","hormonal"],low:"N/A",high:"Folate & B12 deficiency, poor methylation, MTHFR gene variant, cardiovascular risk, neural tube defect risk in pregnancy",note:"Elevated homocysteine is a key methylation marker — critical for fertility, cardiovascular health, and neurological function."},
+  {cat:"inflammation",name:"ANA (Antinuclear Antibodies)",conventional:"Negative / <1:40",optimal:"Negative",symptoms:["Joint pain","Fatigue","Rashes","Autoimmune flares","Unexplained symptoms","Hair loss"],systems:["inflammation","hormonal"],low:"N/A",high:"Possible autoimmunity — requires follow-up with specific ANA panel (anti-dsDNA, anti-Smith, SSA/SSB, etc.)"},
+  {cat:"inflammation",name:"Serum IgA",conventional:"70–400 mg/dL",optimal:"80–320 mg/dL",symptoms:["Frequent illness","Gut issues","Food sensitivities","Skin rashes","Chronic sinus issues","Recurrent UTIs"],systems:["inflammation","gut"],low:"Immunodeficiency, URI, UTI, increased risk of leaky gut, food sensitivities",high:"Parasites, SIBO, gut inflammation/leaky gut, obesity, IBD, psoriasis, coffee sensitivity"},
+  {cat:"inflammation",name:"Serum IgG",conventional:"700–1600 mg/dL",optimal:"700–1600 mg/dL",symptoms:["Chronic infections","Poor immunity","Fatigue","Slow healing","Recurring illness"],systems:["inflammation","gut"],low:"Immunodeficiency, IBD, eczema, leukemia, sinus/GI infections, ear infections, mold exposure",high:"Chronic ongoing infection, inflammation, parasites, liver stagnation"},
+  {cat:"inflammation",name:"Serum IgE",conventional:"<100 IU/mL",optimal:"1–125 IU/mL",symptoms:["Allergies","Asthma","Skin reactions","Digestive issues","Hives","Eczema"],systems:["inflammation","gut"],low:"N/A — lower is better",high:"Parasites, TH2 immune dominance, anaphylaxis risk, food allergies"},
+  {cat:"inflammation",name:"Serum IgM",conventional:"40–230 mg/dL",optimal:"50–240 mg/dL",symptoms:["Acute illness","Poor immune response","Fatigue","Swollen lymph nodes"],systems:["inflammation"],low:"Mito dysfunction, inflammation, autoimmunity, cancer/chemo, poor immunity, immunodeficiency",high:"Acute pathogenic infection, autoimmunity, cancer — first antibody produced in a new infection"},
+  // HORMONES
+  {cat:"hormones",name:"Estradiol (E2)",conventional:"Follicular: 12–166 pg/mL | Ovulation: 85–498 | Luteal: 44–211 pg/mL",optimal:"Follicular: 12.5–166 pg/mL | Ovulation: 85.8–498 pg/mL | Luteal: 43.8–211 pg/mL | Post-meno: <54.7 pg/mL",symptoms:["Irregular cycles","Hot flashes","Mood swings","Low libido","Infertility","Vaginal dryness","Weight gain","Brain fog","Breast tenderness"],systems:["hormonal","nervous","metabolic","flow"],low:"Perimenopause, POI, hypothalamic amenorrhea, excessive exercise, undereating, stress, Hashimoto's",high:"Estrogen dominance — weight gain, heavy periods, breast tenderness, fibroids, endometriosis, PCOS"},
+  {cat:"hormones",name:"Estrone (E1)",conventional:"Pre-meno: 17–200 pg/mL | Post-meno: 7–40 pg/mL",optimal:"Pre-meno: 13–135 pg/mL | Post-meno: 10–55 pg/mL",symptoms:["Hormone imbalance","Weight gain","Breast tenderness","Mood changes","Hot flashes","Estrogen dominance symptoms"],systems:["hormonal","metabolic","detox"],low:"Menopause, adrenal insufficiency, low body fat, ovarian insufficiency",high:"Obesity, liver stagnation, poor estrogen metabolism — fat cells convert androgens to estrone",note:"Elevated E1 in premenopause suggests poor estrogen clearance. Estrone is the dominant estrogen post-menopause."},
+  {cat:"hormones",name:"Progesterone",conventional:"Follicular: 0.1–0.9 ng/mL | Luteal: 1.8–24 ng/mL",optimal:"Follicular: 0.2–1.5 ng/mL | Ovulation: 0.8–3.0 ng/mL | Luteal: 1.7–27 ng/mL | Post-meno: 0.1–0.8 ng/mL",symptoms:["PMS","Irregular cycles","Anxiety","Poor sleep","Infertility","Short luteal phase","Spotting between periods","Miscarriage","Heavy periods","Breast tenderness"],systems:["hormonal","nervous","energy","flow"],low:"Anovulation, luteal phase defect, chronic stress, low LH, poor ovarian reserve, thyroid dysfunction, vitamin D deficiency",high:"Supplementation, rare luteal cysts — in natural cycles, high progesterone is rarely a concern"},
+  {cat:"hormones",name:"Pregnenolone",conventional:"10–230 ng/dL",optimal:"<151 ng/dL (with symptoms context)",symptoms:["Fatigue","Brain fog","Poor stress response","Hormone imbalance","Low mood","Memory issues"],systems:["hormonal","nervous","energy"],low:"Chronic stress (pregnenolone steal), adrenal fatigue, poor cholesterol conversion, aging",high:"Supplementation excess",note:"Pregnenolone is the 'mother hormone' — precursor to cortisol, DHEA, progesterone, estrogen, and testosterone. Chronic stress steals pregnenolone to make cortisol, depleting downstream hormones."},
+  {cat:"hormones",name:"Testosterone Total",conventional:"15–70 ng/dL (women)",optimal:"12–82 ng/dL (women)",symptoms:["Low libido","Fatigue","Brain fog","Hair loss","PCOS","Acne","Irregular cycles","Weight gain","Mood changes"],systems:["hormonal","energy","nervous","metabolic"],low:"Low libido, fatigue, poor muscle tone, adrenal/ovarian insufficiency, oophorectomy",high:"PCOS, insulin resistance, adrenal excess, CAH, exogenous androgens"},
+  {cat:"hormones",name:"DHT (Dihydrotestosterone)",conventional:"3–22 ng/dL (women)",optimal:"4–22 ng/dL",symptoms:["Hair thinning","Acne","PCOS symptoms","Facial hair","Oily skin","Scalp sensitivity"],systems:["hormonal","detox"],low:"Low androgen production, 5-alpha reductase deficiency",high:"Androgenic alopecia, acne, PCOS — increased 5-alpha reductase activity; often driven by insulin resistance"},
+  {cat:"hormones",name:"SHBG",conventional:"18–114 nmol/L (women)",optimal:"20–130 nmol/L",symptoms:["Hormone imbalance","Low libido","PCOS","Fatigue","Androgen excess or deficiency signs"],systems:["hormonal","metabolic","detox"],low:"Insulin resistance, obesity, hypothyroid, high androgens, DM — lowers bound hormone and raises free testosterone",high:"Hyperthyroid, liver disease, high estrogen, low androgens, eating disorders — raises bound hormone and reduces free testosterone"},
+  {cat:"hormones",name:"FSH",conventional:"Follicular: 3.5–12.5 mIU/mL | Ovulation: 4.7–21.5 | Luteal: 1.7–7.7 | Post-meno: 25.8–134.8 mIU/mL",optimal:"Follicular: 3.5–12.5 | Ovulation: 4.7–21.5 | Luteal: 1.7–7.7 mIU/mL",symptoms:["Irregular cycles","Infertility","Hot flashes","Poor ovarian reserve","Anovulation","Short cycles"],systems:["hormonal","flow"],low:"Pituitary dysfunction, hypothalamic amenorrhea, excessive exercise, undereating",high:"Poor ovarian reserve, perimenopause, POI, menopause — ovary not responding, brain signals more loudly"},
+  {cat:"hormones",name:"LH (Luteinizing Hormone)",conventional:"Follicular: 2.4–12.6 mIU/mL | Ovulation: 14–95.6 | Luteal: 1.0–11.4 mIU/mL",optimal:"Follicular: 2.4–12.6 | Ovulation: 14.0–95.6 | Luteal: 1.0–11.4 mIU/mL",symptoms:["Anovulation","Irregular cycles","Infertility","PCOS","Missing LH surge","Luteal phase issues"],systems:["hormonal","flow"],low:"Pituitary dysfunction, hypothalamic amenorrhea, chronic stress, undereating",high:"PCOS (elevated LH:FSH ratio), LH surge at ovulation, perimenopause, poor ovarian reserve",note:"LH:FSH ratio above 2:1 is a key indicator of PCOS even when both values appear 'normal.'"},
+  {cat:"hormones",name:"Prolactin",conventional:"4–29.2 ng/mL (women)",optimal:"4.79–23.30 ng/mL",symptoms:["Irregular cycles","Infertility","Nipple discharge","Low libido","Headaches","Vision changes","Amenorrhea"],systems:["hormonal","nervous","flow"],low:"Pituitary insufficiency",high:"Pituitary adenoma, hypothyroidism, chronic stress, antidepressants/antipsychotics, PCOS, high estrogen"},
+  // ADRENALS
+  {cat:"adrenals",name:"Cortisol AM",conventional:"6.2–19.4 mcg/dL",optimal:"6.2–19.4 mcg/dL (should be highest in AM)",symptoms:["Fatigue","Anxiety","Midsection weight gain","Poor sleep","Blood sugar crashes","Hormone imbalance","Low immunity","Salt cravings"],systems:["energy","hormonal","metabolic","nervous","inflammation"],low:"Adrenal insufficiency, Addison's disease, chronic stress burnout, HPA axis dysregulation, exogenous steroid use",high:"Chronic stress, Cushing's syndrome, poor sleep, blood sugar dysregulation, inflammation, visceral fat",note:"Cortisol follows a diurnal rhythm — highest in the morning, lowest at night. Pattern matters as much as absolute value."},
+  {cat:"adrenals",name:"Cortisol PM",conventional:"2.3–11.9 mcg/dL",optimal:"2.3–11.9 mcg/dL (should be significantly lower than AM)",symptoms:["Evening anxiety","Poor sleep","Wired but tired at night","Night waking","Can't wind down","Midnight hunger"],systems:["nervous","hormonal","energy"],low:"Adrenal insufficiency, advanced HPA axis burnout",high:"Chronic stress, HPA axis dysregulation, poor circadian rhythm, blue light/screen exposure at night"},
+  {cat:"adrenals",name:"ACTH",conventional:"7–63 pg/mL (AM)",optimal:"10–60 pg/mL AM",symptoms:["Fatigue","Adrenal dysfunction","Hormone imbalance","Salt cravings","Low blood pressure","Hyperpigmentation"],systems:["hormonal","nervous","energy"],low:"Pituitary insufficiency, secondary adrenal insufficiency, long-term steroid use",high:"Primary adrenal insufficiency, Addison's disease, ectopic ACTH production, pituitary tumor"},
+  {cat:"adrenals",name:"DHEA-S",conventional:"Varies by age and sex",optimal:"Varies by age and sex — see age-based ranges below",symptoms:["Fatigue","Low libido","Poor stress response","Hormone imbalance","Brain fog","Depression","Muscle weakness","Slow recovery"],systems:["hormonal","energy","nervous","metabolic"],low:"Adrenal insufficiency, aging, chronic stress (adrenal steal), hyperprolactinemia, insulin resistance",high:"PCOS, adrenal tumor, CAH, excess supplementation",note:"DHEA-S is the storage form of DHEA and one of the best markers of adrenal reserve. It naturally declines with age — assess always in context of symptoms and age-specific ranges.",dheaTable:{headers:["Age","Female Optimal (µg/dL)","Male Optimal (µg/dL)"],rows:[["15–19 yrs","65–368","70–492"],["20–24 yrs","148–407","211–492"],["25–34 yrs","99–340","160–449"],["35–44 yrs","61–337","89–427"],["45–54 yrs","35–256","44–331"],["55–64 yrs","19–246","52–295"],["65–74 yrs","9–205","34–249"],[">74 yrs","12–154","16–123"]]}}
+];
+
+let activeTab="all",openCards=new Set();
+function renderTabs(){document.getElementById("tabs").innerHTML=cats.map(c=>'<button class="tab'+(c.id===activeTab?' active':'')+'" onclick="setTab(\''+c.id+'\')">'+c.label+'</button>').join('');}
+function setTab(id){activeTab=id;openCards.clear();renderTabs();renderContent();}
+function getFiltered(){const q=document.getElementById("search").value.toLowerCase().trim();return markers.filter(m=>{const cm=activeTab==="all"||m.cat===activeTab;const sm=!q||m.name.toLowerCase().includes(q)||m.symptoms.some(s=>s.toLowerCase().includes(q))||m.systems.some(s=>SYS[s]&&SYS[s].label.toLowerCase().includes(q))||m.low.toLowerCase().includes(q)||m.high.toLowerCase().includes(q);return cm&&sm;});}
+function filter(){openCards.clear();renderContent();}
+function toggle(uid){if(openCards.has(uid))openCards.delete(uid);else openCards.add(uid);renderContent();}
+function renderContent(){
+  const filtered=getFiltered();
+  const content=document.getElementById("content");
+  const noRes=document.getElementById("no-results");
+  document.getElementById("result-count").textContent=filtered.length+" marker"+(filtered.length!==1?"s":"")+" shown";
+  if(!filtered.length){content.innerHTML="";noRes.style.display="block";return;}
+  noRes.style.display="none";
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const grouped=!q&&activeTab==="all";
+  if(grouped){
+    let html="";
+    cats.filter(c=>c.id!=="all").forEach(cat=>{
+      const cm=filtered.filter(m=>m.cat===cat.id);
+      if(!cm.length)return;
+      html+='<div class="cat-header"><div class="cat-icon-wrap" style="background:'+cat.bg+';color:'+cat.color+'">'+cat.icon+'</div><div class="cat-title">'+cat.label+'</div><div class="cat-count">'+cm.length+' markers</div></div><div class="markers-grid">';
+      cm.forEach((m,i)=>{html+=buildCard(m,cat.id+"_"+i,cat.color);});
+      html+='</div>';
+    });
+    content.innerHTML=html;
+  } else {
+    let html='<div class="markers-grid">';
+    filtered.forEach((m,i)=>{const cat=cats.find(c=>c.id===m.cat)||cats[1];html+=buildCard(m,"r_"+i,cat.color);});
+    html+='</div>';
+    content.innerHTML=html;
+  }
+}
+function buildCard(m,uid,color){
+  const isOpen=openCards.has(uid);
+  let inner='<div class="marker-head"><div class="marker-dot" style="background:'+color+'"></div><div class="marker-name">'+m.name+'</div><div class="marker-range-pill">Optimal: '+m.optimal.split('|')[0].trim()+'</div><span class="marker-chevron">'+(isOpen?'▲':'▼')+'</span></div>';
+  if(isOpen){
+    inner+='<div class="marker-body">';
+    inner+='<div class="ranges-row"><div class="range-box conv"><div class="range-label">📋 Conventional Range</div><div class="range-value">'+m.conventional+'</div></div><div class="range-box opt"><div class="range-label">✦ FNM Optimal Range</div><div class="range-value">'+m.optimal+'</div></div></div>';
+    inner+='<div class="detail-grid">';
+    inner+='<div class="detail-box full"><div class="detail-label">Symptoms When Imbalanced</div><div class="symptom-tags">'+m.symptoms.map(s=>'<span class="stag">'+s+'</span>').join('')+'</div></div>';
+    inner+='<div class="detail-box full"><div class="detail-label">Body Systems Affected</div><div class="systems-row">'+m.systems.map(s=>SYS[s]?'<span class="sys-tag '+SYS[s].cls+'">'+SYS[s].label+'</span>':'').join('')+'</div></div>';
+    inner+='<div class="detail-box low-box"><div class="detail-label">↓ If Low</div><div class="detail-text">'+m.low+'</div></div>';
+    inner+='<div class="detail-box high-box"><div class="detail-label">↑ If High</div><div class="detail-text">'+m.high+'</div></div>';
+    if(m.note)inner+='<div class="detail-box full note-box"><div class="detail-label">🌿 Clinical Note</div><div class="detail-text">'+m.note+'</div></div>';
+    if(m.dheaTable)inner+='<div class="detail-box full"><div class="detail-label">Age-Based DHEA-S Reference Ranges</div><table class="dhea-table"><thead><tr>'+m.dheaTable.headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+m.dheaTable.rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+    inner+='</div></div>';
+  }
+  return '<div class="marker-card'+(isOpen?' open':'')+'" onclick="toggle(\''+uid+'\')">' + inner + '</div>';
+}
+function exportText(){
+  let text="THE MARKER MAP™\nBy Dalia Ayesh MS, RDN — Functional Nutrition Mastery™\n"+"=".repeat(60)+"\n\n";
+  cats.filter(c=>c.id!=="all").forEach(cat=>{
+    const cm=markers.filter(m=>m.cat===cat.id);
+    text+="\n"+cat.label.toUpperCase()+"\n"+"-".repeat(40)+"\n";
+    cm.forEach(m=>{
+      text+="\n"+m.name+"\n";
+      text+="  Conventional Range: "+m.conventional+"\n";
+      text+="  FNM Optimal Range:  "+m.optimal+"\n";
+      text+="  Body Systems: "+m.systems.map(s=>SYS[s]?SYS[s].label:s).join(", ")+"\n";
+      text+="  Symptoms: "+m.symptoms.join(", ")+"\n";
+      text+="  If Low:  "+m.low+"\n";
+      text+="  If High: "+m.high+"\n";
+      if(m.note)text+="  Clinical Note: "+m.note+"\n";
+      if(m.dheaTable){text+="  DHEA-S Age Ranges:\n";m.dheaTable.rows.forEach(r=>{text+="    "+r.join(" | ")+"\n";});}
+    });
+  });
+  const blob=new Blob([text],{type:"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="The-Marker-Map-FNM.txt";a.click();
+  URL.revokeObjectURL(url);
+}
+renderTabs();
+renderContent();
+</script>
+</body>
+</html>
